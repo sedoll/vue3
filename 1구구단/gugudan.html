@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구구단</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="root">
+        <p>{{ num1 }} x {{ num2 }} = ?</p>
+        <input type="number" ref="answer" v-model="res">
+        <button v-on:click="fn()">입력</button>
+        <p>정답 개수 : <strong>{{cnt}}</strong></p>
+        <br>
+        <ul>
+            <li v-for="list in guguList">{{list}}</li>
+        </ul>
+    </div>
+</body>
+<script src="script.js"></script>
+</html>
