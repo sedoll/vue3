@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 - 숫자야구</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <strong>0~9까지 4자리로 이루어진 숫자를 맞춰보세요</strong>
+        <p>규칙</p>
+        <ul>
+            <li>숫자는 중복되지 않습니다.</li>
+            <li>기회는 총 10번 입니다.</li>
+        </ul>
+        <br>
+
+        <input type="text" v-model="value">
+        <button v-on:click="submit">입력</button>
+        <br>
+
+        <ol>
+            <li v-for="data in lst">{{data}}</li>
+        </ol>
+    </div>
+</body>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                res: "", // 정답
+                cnt: 10, // 남은 기회
+                lst: [], // log
+                value: "" // 입력값
+            };
+        },
+        methods: {
+            // 4자리 숫자 생성 함수
+            generateRandomNumber() {
+                const digits = [];
+                while (digits.length < 4) {
+                    const randomDigit = Math.floor(Math.random() * 10); // 0~9 사이의 랜덤 숫자
+                    if (!digits.includes(randomDigit)) {
+                        digits.push(randomDigit);
+                    }
+                }
+                return digits.join(""); // 배열을 문자열로 변환
+            },
+            // 입력
+            submit() {
+                let strike = 0; // 스트라이크
+                let ball = 0; // 볼
+
+                if (this.cnt < 1) {
+                    alert(`정답을 맞추지 못하였습니다. \n정답은 ${this.res} 이었습니다.`);
+                    window.location.reload();
+                    return;
+                }
+
+                if (Number(this.value) && this.value.length === 4) {
+                    for (let i = 0; i < 4; i++) {
+                        for (let j = 0; j < 4; j++) {
+                            if (this.value[i] === this.res[j] && i !== j) {
+                                ball++;
+                            } else if (this.value[i] === this.res[j] && i === j) {
+                                strike++;
+                            }
+                        }
+                    }
+                    this.cnt--;
+                    if (strike === 4) {
+                        alert(`정답을 맞췄습니다! 정답은 ${this.res} 이었습니다.`);
+                        window.location.reload();
+                    } else {
+                        this.lst.push(`Strike: ${strike}, Ball: ${ball}, input: ${this.value}`);
+                    }
+                } else {
+                    alert("값을 제대로 입력해주세요.");
+                }
+                this.value = ""; // 입력값 초기화
+            }
+        },
+        mounted() {
+            // 페이지 로드 시 정답 초기화
+            this.res = this.generateRandomNumber();
+        }
+    }).mount("#app");
+</script>
+</html>

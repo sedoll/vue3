@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 - 반응속도</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #square {
+            width: 100px;
+            height: 100px;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <strong>당신의 반응속도를 검사하겠습니다.</strong>
+        <p>키보드 c를 누르고 사각형의 색상이 변할때 클릭해주세요.</p>
+        <strong v-if="check">시작</strong>
+        <br><br><br>
+        <div id="square"></div>
+    </div>
+</body>
+<script>
+    const {createApp} = Vue
+
+    createApp({
+        data() {
+            return {
+                res: 0.0,
+                time: 0.0,
+                timer: null,
+                check: 0,
+            }
+        },
+        methods: {
+            async start() {
+                const randomDigit = Math.floor(Math.random() * 5) + 1; // 1~5 초 랜덤
+                await this.sleep(randomDigit * 1000); // sleep 함수 호출
+                this.changeSquareColor(); // 색상 변경 및 타이머 시작
+            },
+            // sleep 함수 (Promise 기반)
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            // 색상 변경 및 타이머 시작
+            changeSquareColor() {
+                const square = document.getElementById("square");
+                if (square) {
+                    square.style.backgroundColor = "blue"; // 색상 변경
+                    this.startTimer(); // 타이머 시작
+                }
+            },
+            // 타이머 시작
+            startTimer() {
+                this.time = 0.0; // 초기화
+                if (this.timer) clearInterval(this.timer); // 기존 타이머 정리
+                this.timer = setInterval(() => {
+                    this.time += 0.01; // 10ms마다 시간 증가
+                    if (this.time >= 10) { // 10초가 지나면 자동 종료
+                        if (this.timer) clearInterval(this.timer);
+                        alert('10초가 지났으므로 자동 종료합니다.')
+                        window.location.reload()
+                    }
+                }, 10);
+            }
+        },
+        mounted() {
+            // 키보드 이벤트 등록
+            window.addEventListener("keydown", (event) => {
+                if (event.key === "c" || event.key === "C") {
+                    this.check = 1;
+                    this.start();
+                }
+            });
+
+            document.getElementById("square").addEventListener("click", ()=> {
+                if (!this.check) {
+                    alert('아직 누를 타이밍이 아닙니다.')
+                    return
+                }
+                if (this.timer) clearInterval(this.timer); // 기존 타이머 정리
+                alert(`${this.time.toFixed(4)} ms`)
+                window.location.reload()
+            })
+        },
+        beforeUnmount() {
+            // 키보드 이벤트 제거
+            window.removeEventListener("keydown", this.start);
+        }
+    }).mount("#app");
+</script>
+</html>
